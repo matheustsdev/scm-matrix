@@ -1,37 +1,54 @@
-/*
- * C Program to List Files in Directory
-	https://www.sanfoundry.com/c-program-list-files-directory/
- */
 #include <dirent.h>
 #include <stdio.h>
- 
-int main(void)
-{
+#include <string.h>
+#include <stdlib.h>
+#include "pgm.h"
+#include "utils.h"
+
+#define DIR_NAME "./images/"
+
+int main(void) {
     DIR *d;
+    char *dirName = "./images", pathName[526];
+    int count = 0, i = 0;
+    char **fileNamesList;
     struct dirent *dir;
-    d = opendir("./images");
-    if (d)
-    {
-        while ((dir = readdir(d)) != NULL)
-        {
-            printf("%s\n", dir->d_name);
+    struct pgm img;
 
-            // Iniciar medição do tempo. 
+    count = countFilesInDirectory(DIR_NAME);
 
-            // Leitura da Imagem -PGM
+    fileNamesList = (char**) malloc(sizeof(char*) * count);
 
-            // Processar
-            
-            // Saída - Salvar matriz vetorizada no arquivo de características
+    for(i = 0; i < count; i++) {
+        fileNamesList[i] = (char*) malloc(sizeof(char) * 128);
+    }
+    
+    getFilesName(fileNamesList, DIR_NAME);
 
-            // Finalizar medição do tempo.
+    // Bubble sort
+    strArraySort(fileNamesList, count);
 
-            // Acumular tempo medido. 
-        }
-        closedir(d);
-
-        // Calcular tempo médio por imagem.
+    for(i = 0; i < count; i++) {
+        printf("%s\n", fileNamesList[i]);
+        sprintf(pathName, "%s%s", DIR_NAME, fileNamesList[i]);
+        readPGMImage(&img, pathName);
     }
 
-    return(0);
-}		
+    // Iniciar medição do tempo. 
+
+    // Leitura da Imagem -PGM
+
+    // Processar
+            
+    // Saída - Salvar matriz vetorizada no arquivo de características
+
+    // Finalizar medição do tempo.
+
+    // Acumular tempo medido. 
+
+    // Calcular tempo médio por imagem.
+
+    return 0;
+}
+
+
