@@ -1,15 +1,27 @@
 
-void saveVector(FILE *featureFile, int *matrix, int rows, int column){
+#include <unistd.h>
+#include <sys/types.h>
+
+
+typedef struct{
+    
+    int *pmatrix;
+    int c;
+    int r;
+
+}cooccurrenceMatrix;
+
+void saveVector(FILE *featureFile, cooccurrenceMatrix *mat){
 
     int pos = 0;
 
-    for(int i = 0; i < column*rows; i++){
-        fprintf(featureFile, "%d, ", *(matrix + i)); // convert integer to string
+    for(int i = 0; i < mat->c * mat->r; i++){
+        fprintf(featureFile, "%d, ", *(mat->pmatrix + i)); 
     }
 
-    fseeko(featureFile, -2, SEEK_END); // change file position 
-    pos = ftello(featureFile); //get position value
-    ftruncate(fileno(featureFile), pos); //delete 
+    fseeko(featureFile, -2, SEEK_END); 
+    pos = ftello(featureFile); 
+    ftruncate(fileno(featureFile), pos); 
 
     putc('\n', featureFile);
 }
