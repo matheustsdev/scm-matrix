@@ -49,4 +49,6 @@ int main(void) {
     // Calcular tempo médio por imagem.
 
     return 0;
-}		
+}
+
+
