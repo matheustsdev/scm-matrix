@@ -2,6 +2,10 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+#include <unistd.h>
+#include <sys/types.h>
+#include <math.h>
+
 #include "pgm.h"
 #include "utils.h"
 #include "scm.h"
@@ -58,65 +62,48 @@ int countFilesInDirectory(char *relativePath) {
             }
         }
     }
+    
     closedir(d);
 
     return count;
 }
 
-void matrixAtoiQuantization(Matrix *convertedMatrix, struct pgm pgmImg, int quantizationLevel) {
-    char *splittedString;
-    int tempInt, j, k;
-    struct pgm copyImg = pgmImg;
-
-    printf("Atoi");
-
-    // Get row to split
-    for(j = 0; j < pgmImg.r; j++) {
-        k = 0;
-
-        // Split string add in int matrix
-        while(splittedString != NULL) {
-            // splittedString = strtok(copyImg.pData[j], " ");
-            printf("%d\n", copyImg.pData[1]);
-
-            tempInt = atoi(splittedString);
-
-            *(convertedMatrix->matrix + k) = quantizationValue(tempInt, quantizationLevel);
-        }
-    }
-}
-
-void getCooccurrenceMatrix(Matrix cooccurrenceBuffer , int *firstMatrix, int *secondMatrix, int pgmSquareSize) {
-    int i, j, sum = 0;
+void getCooccurrenceMatrix(Matrix *cooccurrenceBuffer , int *firstMatrix, int *secondMatrix, int totalElementsInImg) {
+    int i = 0, j = 0, sum = 0;
     int convertedIValue, convertedJValue, matrixIndex;
 
-        for(i = 0; i < pgmSquareSize * pgmSquareSize; i++) {
+        for(i = 0; i < totalElementsInImg; i++) {
             convertedIValue = *(firstMatrix + i);
             convertedJValue = *(secondMatrix + i);
 
-            matrixIndex = convertedIValue * cooccurrenceBuffer.column + convertedJValue;
+            matrixIndex = convertedIValue * cooccurrenceBuffer->column + convertedJValue;
 
-            cooccurrenceBuffer.matrix[matrixIndex] += 1;  
+            cooccurrenceBuffer->matrix[matrixIndex] += 1;  
         }
-
-        puts("\n");
-
-        for(i = 0; i < cooccurrenceBuffer.rows; i++) {
-        for( j = 0; j < cooccurrenceBuffer.column; j++) {
-            matrixIndex = i * cooccurrenceBuffer.column + j;
-
-            sum += *(cooccurrenceBuffer.matrix + matrixIndex);
-
-            printf("%d ", *(cooccurrenceBuffer.matrix + matrixIndex));
-        }
-        puts("\n");
-      }
 }
 
-void initializeMatrix(Matrix matrix, int initializedValue) {
+void initializeMatrix(Matrix *matrix, int initializedValue) {
     int i;
 
-    for(i = 0; i < matrix.column * matrix.rows; i++) {
-        *(matrix.matrix + i) = initializedValue;
+    for(i = 0; i < matrix->column * matrix->rows; i++) {
+        *(matrix->matrix + i) = initializedValue;
     }
+}
+
+void saveVectorInFile(FILE *featureFile, Matrix *matrix){
+
+    int position = 0;
+
+    for(int i = 0; i < matrix->column * matrix->rows; i++){
+        fprintf(featureFile, "%d, ", *(matrix->matrix + i)); 
+    }
+
+    fseeko(featureFile, -2, SEEK_END); 
+    position = ftello(featureFile); 
+    ftruncate(fileno(featureFile), position); 
+
+}
+
+double log2Function(double value) {
+    return log(value)/log(2);
 }
