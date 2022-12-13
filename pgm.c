@@ -77,14 +77,29 @@ void writePGMImage(struct pgm *pio, char *filename, int level){
 }
 
 void viewPGMImage(struct pgm *pio){
-	printf("Tipo: %d\n",pio->tipo);
-	printf("Dimensões: [%d %d]\n",pio->c, pio->r);
-	printf("Max: %d\n",pio->mv);
 
 	for (int k=0; k < (pio->r * pio->c); k++){
 		if (!( k % pio->c)) printf("\n");
 		printf("%2hhu ",*(pio->pData+k));
 	}	
+	printf("Tipo: %d\n",pio->tipo);
+	printf("Dimensões: [%d %d]\n",pio->c, pio->r);
+	printf("Max: %d\n",pio->mv);
 	printf("\n");
 }
 
+void quantizationMatrix(int *bufferMatrix , struct pgm pgmImg, int quantizationLevel){
+    int totalOfElements = pgmImg.r * pgmImg.c;
+    int quantizationLevelRange = 256/quantizationLevel;
+    int matrixValue, pgmData;
+
+    for(int i = 0; i < totalOfElements; i++){
+		pgmData = *(pgmImg.pData+i);
+
+        matrixValue = pgmData/quantizationLevelRange;
+
+		*(bufferMatrix + i) = matrixValue;
+
+		//printf("%d ", *(bufferMatrix + i));
+    }
+}
