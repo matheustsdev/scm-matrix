@@ -1,37 +1,81 @@
-/*
- * C Program to List Files in Directory
-	https://www.sanfoundry.com/c-program-list-files-directory/
- */
 #include <dirent.h>
 #include <stdio.h>
- 
-int main(void)
-{
+#include <string.h>
+#include <stdlib.h>
+#include "pgm.h"
+#include "scm.h"
+#include "utils.h"
+
+#define DIR_NAME "./images/"
+
+int main(void) {
     DIR *d;
     struct dirent *dir;
-    d = opendir("./images");
-    if (d)
-    {
-        while ((dir = readdir(d)) != NULL)
-        {
-            printf("%s\n", dir->d_name);
+    struct pgm pgmImg, meanPgmImg;
 
-            // Iniciar medição do tempo. 
+    Matrix pgmDataMatrix, *pgmMeanDataMatrix, cooccurrenceMatrix;
+    int count = 0, i, j, k, tempInt;
+    int quantizationLevel = 8;
+    int *quantizedMatrix, *meanQuantizedMatrix;
 
-            // Leitura da Imagem -PGM
+    char pathName[526];
+    char **fileNamesList;
 
-            // Processar
-            
-            // Saída - Salvar matriz vetorizada no arquivo de características
+    count = countFilesInDirectory(DIR_NAME);
 
-            // Finalizar medição do tempo.
+    fileNamesList = (char**) malloc(sizeof(char*) * count);
 
-            // Acumular tempo medido. 
-        }
-        closedir(d);
+    for(i = 0; i < count; i++) {
+        fileNamesList[i] = (char*) malloc(sizeof(char) * 128);
+    }
+    
+    getFilesName(fileNamesList, DIR_NAME);
 
-        // Calcular tempo médio por imagem.
+    // Bubble sort
+    strArraySort(fileNamesList, count);
+
+    // Read files and operation
+    for(i = 0; i < 1; i++) {
+        sprintf(pathName, "%s%s", DIR_NAME, fileNamesList[i++]);
+        readPGMImage(&pgmImg, pathName);
+
+        printf("%s\n", pathName);
+
+        sprintf(pathName, "%s%s", DIR_NAME, fileNamesList[i++]);
+        readPGMImage(&meanPgmImg, pathName);
+
+        printf("%s\n", pathName);
+
+        quantizedMatrix = (int*) malloc(sizeof(int) * pgmImg.c * pgmImg.r);
+        meanQuantizedMatrix = (int*) malloc(sizeof(int) * meanPgmImg.c * meanPgmImg.r);
+
+        quantizationMatrix(quantizedMatrix, pgmImg, quantizationLevel);
+        quantizationMatrix(meanQuantizedMatrix, meanPgmImg, quantizationLevel);
+
+        cooccurrenceMatrix.matrix = (int*) malloc(sizeof(int) * quantizationLevel * quantizationLevel);
+        cooccurrenceMatrix.rows = quantizationLevel;
+        cooccurrenceMatrix.column = quantizationLevel;
+
+        initializeMatrix(cooccurrenceMatrix, 0);
+
+        getCooccurrenceMatrix(cooccurrenceMatrix, quantizedMatrix, meanQuantizedMatrix, pgmImg.r);
     }
 
-    return(0);
-}		
+    // Iniciar medição do tempo. 
+
+    // Leitura da Imagem -PGM
+
+    // Processar
+            
+    // Saída - Salvar matriz vetorizada no arquivo de características
+
+    // Finalizar medição do tempo.
+
+    // Acumular tempo medido. 
+
+    // Calcular tempo médio por imagem.
+
+    return 0;
+}
+
+
