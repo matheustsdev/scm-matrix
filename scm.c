@@ -1,6 +1,7 @@
 
 #include <stdlib.h>
 #include <time.h>
+#include <stdio.h>
 #include "scm.h"
 #include "pgm.h"
 #include "utils.h"

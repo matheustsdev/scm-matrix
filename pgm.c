@@ -2,11 +2,11 @@
 #include <stdlib.h>
 #include "pgm.h"
 
-
 void readPGMImage(struct pgm *pio, char *filename){
 
 	FILE *fp;
 	char ch;
+
 
 	if (!(fp = fopen(filename,"r"))){
 		perror("Erro.");
@@ -53,6 +53,7 @@ void readPGMImage(struct pgm *pio, char *filename){
 			puts("Não está implementado");
 	}
 	
+	
 	fclose(fp);
 
 }
@@ -90,7 +91,7 @@ void viewPGMImage(struct pgm *pio){
 
 void quantizationMatrix(int *bufferMatrix , struct pgm pgmImg, int quantizationLevel){
     int totalOfElements = pgmImg.r * pgmImg.c;
-    int quantizationLevelRange = 256/quantizationLevel;
+    int quantizationLevelRange = pgmImg.mv/quantizationLevel;
     int matrixValue, pgmData;
 
     for(int i = 0; i < totalOfElements; i++){
@@ -99,7 +100,6 @@ void quantizationMatrix(int *bufferMatrix , struct pgm pgmImg, int quantizationL
         matrixValue = pgmData/quantizationLevelRange;
 
 		*(bufferMatrix + i) = matrixValue;
-
-		//printf("%d ", *(bufferMatrix + i));
     }
+
 }
