@@ -6,9 +6,11 @@ This application use images, in PMG format, of colon TMA with just one color cha
 
 ## Building
 
-This repository have a Makefile file to facilitate the compilation of executable file. So, is just needed use this command:
+This repository have a Makefile file to facilitate the compilation of executable file. So, after clone the repository, is just needed use command make:
 
 ```bash
+  $ git clone https://github.com/matheustsdev/scm-matrix.git
+  $ cd scm-matrix
   $ make
 ```
 
