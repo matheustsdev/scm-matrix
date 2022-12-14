@@ -5,12 +5,6 @@ typedef struct Matrix{
     int rows;
 } Matrix;
 
-// Array with pointer to its beginning and its length.
-typedef struct {
-    int length;
-    int *array;
-} Array;
-
 void strArraySort(char**, int);
 void getFilesName(char**, char *);
 int countFilesInDirectory(char *);
