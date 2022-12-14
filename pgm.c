@@ -92,7 +92,9 @@ void viewPGMImage(struct pgm *pio){
 
 void quantizationMatrix(int *bufferMatrix , struct pgm pgmImg, int quantizationLevel){
     int totalOfElements = pgmImg.r * pgmImg.c;
-    int quantizationLevelRange = pgmImg.mv/quantizationLevel;
+	
+	// Add one for return total number of options
+    int quantizationLevelRange = pgmImg.mv+1/quantizationLevel;
     int matrixValue, pgmData;
 
     for(int i = 0; i < totalOfElements; i++){
