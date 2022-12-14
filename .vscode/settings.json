@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "pgm.h": "c",
+    "utils.h": "c",
+    "stdio.h": "c"
+  }
+}

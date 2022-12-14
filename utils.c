@@ -8,29 +8,25 @@
 
 #include "pgm.h"
 #include "utils.h"
-#include "scm.h"
 
 // Bubble sort
 void strArraySort(char **strArray, int size) {
     char temp[256];
 
     for(int i = 0; i < size; i++)
-
       for(int j = 0; j < size - 1; j++){
-
          if(strcmp(strArray[i],strArray[j]) < 0){
-            strcpy(temp,strArray[i]);
+            strcpy(temp, strArray[i]);
             strcpy(strArray[i],strArray[j]);
             strcpy(strArray[j],temp);
-         }
+         }     
       }
 }
 
 void getFilesName(char **fileNamesArray, char *relativePath) {
     DIR *d;
-    int count = 0, i = 0, j = 0;
+    int count = 0, i = 0;
     struct dirent *dir;
-    char temp[128];
 
     d = opendir(relativePath);
      
@@ -38,7 +34,6 @@ void getFilesName(char **fileNamesArray, char *relativePath) {
        while ((dir = readdir(d)) != NULL ) {
             if(strlen(dir->d_name) > 2) {
                 strcpy(fileNamesArray[i], dir->d_name);
-
                 i++;
             }
         }
@@ -57,6 +52,7 @@ int countFilesInDirectory(char *relativePath) {
      
     if (d) {
         while ((dir = readdir(d)) != NULL ) {
+            // Remove . and .. in reading files
             if(strlen(dir->d_name) > 2) {
                 count++;
             }
@@ -69,7 +65,7 @@ int countFilesInDirectory(char *relativePath) {
 }
 
 void getCooccurrenceMatrix(Matrix *cooccurrenceBuffer , int *firstMatrix, int *secondMatrix, int totalElementsInImg) {
-    int i = 0, j = 0, sum = 0;
+    int i = 0, j = 0;
     int convertedIValue, convertedJValue, matrixIndex;
 
         for(i = 0; i < totalElementsInImg; i++) {
@@ -77,7 +73,7 @@ void getCooccurrenceMatrix(Matrix *cooccurrenceBuffer , int *firstMatrix, int *s
             convertedJValue = *(secondMatrix + i);
 
             matrixIndex = convertedIValue * cooccurrenceBuffer->column + convertedJValue;
-
+    
             cooccurrenceBuffer->matrix[matrixIndex] += 1;  
         }
 }
@@ -102,8 +98,4 @@ void saveVectorInFile(FILE *featureFile, Matrix *matrix){
     position = ftello(featureFile); 
     ftruncate(fileno(featureFile), position); 
 
-}
-
-double log2Function(double value) {
-    return log(value)/log(2);
 }

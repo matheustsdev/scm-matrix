@@ -6,20 +6,17 @@
 #include <time.h>
 
 #include "pgm.h"
-#include "scm.h"
 #include "utils.h"
 
 #define DIR_NAME "./images/"
 
 int main(int argc, char* argv[]) {
-    DIR *d;
     FILE *featureFile, *readPGMImagesOrder;
-    struct dirent *dir;
     struct pgm pgmImg, meanPgmImg;
     Matrix pgmDataMatrix, *pgmMeanDataMatrix, cooccurrenceMatrix;
     clock_t timestampBegin, timestampEnd;
 
-    int count = 0, i, j, k, tempInt;
+    int filesCount = 0, i, j;
     int quantizationLevel;
     int *quantizedMatrix, *meanQuantizedMatrix;
 
@@ -27,12 +24,11 @@ int main(int argc, char* argv[]) {
 
     char pathName[526];
     char **fileNamesList;
-    char *txtFile = "_quantization.txt";
-    char *featureFileName = strcat(argv[1], txtFile);
+    char *sufixNameTxtFile = "_quantization.txt";
+    char *featureFileName = strcat(argv[1], sufixNameTxtFile);
     char fileType;
 
-
-    // Start program validation
+    // Start quantization level validation region
 
     if(argc != 2){
         puts("\n\tPut the quantization value.\n");
@@ -41,35 +37,40 @@ int main(int argc, char* argv[]) {
 
     quantizationLevel = atoi(argv[1]);
 
-    if((ceil(log2(quantizationLevel)) != floor(log2(quantizationLevel)))){
-        puts("Incorret value. The value must be power of 2.\n");
-        exit(2);
-    }
-
     if(quantizationLevel < 0){
         puts("Incorret value. The value must be bigger than zero.\n");
-        exit(3);
+        exit(2);
     }
 
     if(quantizationLevel > 256){
         puts("Incorret value. The value must be smaller than 256.\n");
+        exit(3);
+    }
+    
+    // Verify if number is a power of 2
+    if((ceil(log2(quantizationLevel)) != floor(log2(quantizationLevel)))){
+        puts("Incorret value. The value must be power of 2.\n");
         exit(4);
     }
 
-    // End validation
+    // End quantization level validation region
 
-    count = countFilesInDirectory(DIR_NAME);
+    filesCount = countFilesInDirectory(DIR_NAME);
 
-    fileNamesList = (char**) malloc(sizeof(char*) * count);
+    // Alloc memory for list
+    fileNamesList = (char**) malloc(sizeof(char*) * filesCount);
 
-    for(i = 0; i < count; i++) {
+    // Alloc memory for EACH string in the list
+    for(i = 0; i < filesCount; i++) {
         fileNamesList[i] = (char*) malloc(sizeof(char) * 128);
     }
     
     getFilesName(fileNamesList, DIR_NAME);
 
-    // Bubble sort
-    strArraySort(fileNamesList, count);
+    // Ordering file names
+    strArraySort(fileNamesList, filesCount);
+
+    // Begin of open files region
 
     featureFile = fopen(featureFileName, "w");
 
@@ -77,23 +78,28 @@ int main(int argc, char* argv[]) {
         puts("File open error: save data to a text file.");
         exit(1);
     }
+    
+    readPGMImagesOrder = fopen("readPGMImagesOrder.txt","w");
 
-    if (!(readPGMImagesOrder = fopen("readPGMImagesOrder.txt","w"))){
-        perror("Erro.");
-        exit(1);
+    if (readPGMImagesOrder == NULL){
+        puts("File open error: save data to a text file.");
+        exit(2);
 	}
+    
+    // End of open files region
 
     cooccurrenceMatrix.rows = quantizationLevel;
     cooccurrenceMatrix.column = quantizationLevel;
 
     // Read files and operation
-    for(i = 0; i < count; i++) {
+    for(i = 0; i < filesCount; i++) {
         timestampBegin = clock();
 
         printf("\nName: %s\n", fileNamesList[i]);
 
         fprintf(readPGMImagesOrder, "%s\n", *(fileNamesList+i));
-
+        
+        // Create a relative path to standart image
         sprintf(pathName, "%s%s", DIR_NAME, fileNamesList[i++]);
         readPGMImage(&pgmImg, pathName);
 
@@ -102,6 +108,7 @@ int main(int argc, char* argv[]) {
         sprintf(pathName, "%s%s", DIR_NAME, fileNamesList[i]);
         readPGMImage(&meanPgmImg, pathName);
 
+        // Alloc memory to quantization
         quantizedMatrix = (int*) malloc(sizeof(int) * pgmImg.c * pgmImg.r);
         meanQuantizedMatrix = (int*) malloc(sizeof(int) * meanPgmImg.c * meanPgmImg.r);
 
@@ -112,12 +119,18 @@ int main(int argc, char* argv[]) {
 
         initializeMatrix(&cooccurrenceMatrix, 0);
 
+        // Create the cooccurrence matrix
         getCooccurrenceMatrix(&cooccurrenceMatrix, quantizedMatrix, meanQuantizedMatrix, pgmImg.r * pgmImg.c);
 
+        // Get label of images
         fileType = fileNamesList[i][0];
 
+        // Save the matrix in list format
         saveVectorInFile(featureFile, &cooccurrenceMatrix);
+        
+        // Add the label in the file
         fprintf(featureFile, ", %c\n", fileType);
+        
         putc('\n', readPGMImagesOrder);
 
         timestampEnd = clock();
@@ -132,7 +145,7 @@ int main(int argc, char* argv[]) {
 
     puts("\n"); 
 
-	printf("Tempo médio: %lf\n", totalTime / count);
+	printf("Tempo médio: %lf\n", totalTime / filesCount);
 	printf("Tempo Total: %lf\n", totalTime);
     
     free(fileNamesList);

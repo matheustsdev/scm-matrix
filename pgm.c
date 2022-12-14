@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+
 #include "pgm.h"
 
 void readPGMImage(struct pgm *pio, char *filename){
